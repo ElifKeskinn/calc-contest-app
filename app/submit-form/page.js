@@ -67,7 +67,7 @@ export default function SubmitForm() {
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         />
         <input
-          type="text"
+          type="phone"
           placeholder="Phone"
           value={formData.phone}
           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
