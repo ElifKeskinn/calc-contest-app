@@ -1,34 +1,34 @@
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse } from 'next/server'
+// utils/supabase/middleware.js
+import { supabaseServer } from '@/lib/server';
+import { NextResponse } from 'next/server';
 
 export async function updateSession(request) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
+  // Example operation: Validate a code or perform other server-side tasks
+  const code = request.nextUrl.searchParams.get('code');
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
+  if (code) {
+    const { data, error } = await supabaseServer
+      .from('codes')
+      .select('*')
+      .eq('code', code)
+      .eq('is_used', false)
+      .single();
+
+    if (error || !data) {
+      return NextResponse.redirect(new URL('/invalid-code', request.url));
     }
-  )
 
-  // refreshing the auth token
-  await supabase.auth.getUser()
+    // Mark the code as used
+    const { error: updateError } = await supabaseServer
+      .from('codes')
+      .update({ is_used: true })
+      .eq('id', data.id);
 
-  return supabaseResponse
+    if (updateError) {
+      console.error('Error updating code:', updateError);
+      return NextResponse.error();
+    }
+  }
+
+  return NextResponse.next();
 }
