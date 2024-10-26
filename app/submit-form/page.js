@@ -1,4 +1,5 @@
-"use client";
+'use client';
+export const dynamic = 'force-dynamic';
 
 import { supabase } from '../../lib/client';
 import { z } from 'zod';
@@ -69,8 +70,8 @@ export default function SubmitForm() {
     email: '',
     phone: '',
     department: '',
-    grade: 'Sınıf Seçiniz', 
-    age: '',
+    grade: '', // Boş bırakıldı
+    age: '', // Başlangıçta boş
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false); // Loading durumu ekleyelim
@@ -104,7 +105,10 @@ export default function SubmitForm() {
 
     try {
       // Validate form data
-      formSchema.parse(formData);
+      formSchema.parse({
+        ...formData,
+        age: formData.age === '' ? undefined : formData.age, // age boşsa undefined olarak ayarla
+      });
 
       // Normalize phone number (digits only) for duplication check
       const normalizedPhone = formData.phone.replace(/\D/g, '');
@@ -171,7 +175,7 @@ export default function SubmitForm() {
           required
           className="form-input"
         />
-  
+
         {/* Email Field */}
         <input
           type="email"
@@ -182,7 +186,7 @@ export default function SubmitForm() {
           required
           className="form-input"
         />
-  
+
         {/* Phone Field */}
         <input
           type="text"
@@ -193,7 +197,7 @@ export default function SubmitForm() {
           required
           className="form-input"
         />
-  
+
         {/* Department Field */}
         <input
           type="text"
@@ -204,7 +208,7 @@ export default function SubmitForm() {
           required
           className="form-input"
         />
-  
+
         {/* Grade Field */}
         <select
           name="grade"
@@ -213,9 +217,7 @@ export default function SubmitForm() {
           required
           className="form-select"
         >
-        
-          <option disabled value="Sınıf Seçiniz">Sınıf Seçiniz</option>
-
+          <option disabled value="">Sınıf Seçiniz</option>
           <option value="Hazırlık Sınıfı">Hazırlık Sınıfı</option>
           <option value="1. Sınıf">1. Sınıf</option>
           <option value="2. Sınıf">2. Sınıf</option>
@@ -223,7 +225,7 @@ export default function SubmitForm() {
           <option value="4. Sınıf">4. Sınıf</option>
           <option value="Diğer">Diğer</option>
         </select>
-  
+
         {/* Age Field */}
         <input
           type="number"
@@ -236,7 +238,7 @@ export default function SubmitForm() {
           max="99"
           className="form-input"
         />
-  
+
         <button type="submit" disabled={loading} className="submit-button">
           {loading ? 'Gönderiliyor...' : 'Gönder'}
         </button>
@@ -244,5 +246,4 @@ export default function SubmitForm() {
       {error && <p className="error-message">{error}</p>}
     </div>
   );
-  
 }
