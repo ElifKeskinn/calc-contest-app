@@ -3,15 +3,15 @@ import { supabase } from '../../lib/client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-
-export default function CheckCode() {
+export default function CheckCodePage() {
   const router = useRouter();
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
 
   const handleCodeCheck = async (e) => {
-    const lowerCaseCode = code.toLowerCase();
     e.preventDefault();
+    const lowerCaseCode = code.toLowerCase();
+
     const { data, error } = await supabase
       .from('codes')
       .select('*')
@@ -41,5 +41,4 @@ export default function CheckCode() {
       {error && <p className="error-message">{error}</p>}
     </div>
   );
-  
 }
