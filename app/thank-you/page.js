@@ -1,32 +1,38 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function ThankYou() {
   const router = useRouter();
+  const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
-    // Disable the back button from bringing the user back to the form
+    // Kullanıcının geri butonunu kullanarak form sayfasına dönmesini engellemek
     window.history.pushState(null, '', window.location.href);
     window.onpopstate = () => {
       window.history.pushState(null, '', window.location.href);
     };
+  }, []);
 
-    // Redirect to homepage after 5 seconds
-    const timer = setTimeout(() => {
+  useEffect(() => {
+    if (countdown <= 0) {
       router.push('/');
-    }, 5000);
+      return;
+    }
 
-    // Cleanup the timer when component unmounts
+    const timer = setTimeout(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
+
     return () => clearTimeout(timer);
-  }, [router]);
+  }, [countdown, router]);
 
   return (
     <div>
-      <h1>Thank you for submitting your information!</h1>
-      <p>You will be redirected to the homepage in 5 seconds.</p>
+      <h1>Bilgilerinizi gönderdiğiniz için teşekkür ederiz!</h1>
+      <p>
+        Ana sayfaya {countdown} saniye içinde yönlendiriliyorsunuz.
+      </p>
     </div>
   );
 }
-
-/*geri sayım eklencek */
