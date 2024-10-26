@@ -1,7 +1,5 @@
-'use client';
-
 import { Suspense } from 'react';
-import SubmitForm from '../component/SubmitForm';
+import SubmitForm from './SubmitForm';
 
 export default function SubmitFormPage() {
   return (
