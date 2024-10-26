@@ -18,7 +18,7 @@ export default function CheckCode() {
       .single();
 
     if (error || !data) {
-      setError('Invalid or already used code');
+      setError('Geçersiz ya da kullanılmış bir kod girdiniz.');
     } else {
       router.push(`/submit-form?code_id=${data.id}`);
     }
@@ -31,9 +31,9 @@ export default function CheckCode() {
           type="text"
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          placeholder="Enter your code"
+          placeholder="Kodunuzu giriniz"
         />
-        <button type="submit">Submit</button>
+        <button type="submit">Gönder</button>
       </form>
       {error && <p>{error}</p>}
     </div>

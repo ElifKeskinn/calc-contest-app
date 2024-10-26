@@ -6,23 +6,23 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 const formSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email'),
+  name: z.string().min(1, 'İsim alanı zorunludur'),
+  email: z.string().email('Geçersiz email'),
   phone: z.string()
-    .regex(/^0\(\d{3}\)-\d{2}-\d{2}$/, 'Phone number must be in the format 0(XXX)-XX-XX')
+    .regex(/^0\(\d{3}\)-\d{3}-\d{2}-\d{2}$/, 'Telefon numaranız 0(XXX)-XXX-XX-XX formatında olmalıdır')
     .refine((val) => {
       const digits = val.replace(/\D/g, '');
       return digits.length === 11;
-    }, 'Phone number must contain exactly 11 digits'),
-  department: z.string().min(1, 'Department is required'),
+    }, 'Telefon numaranız 11 haneli olmalıdır'),
+  department: z.string().min(1, 'Bölüm alanı zorunludur'),
   grade: z.enum(['Hazırlık Sınıfı', '1. Sınıf', '2. Sınıf', '3. Sınıf', '4. Sınıf', 'Diğer'], {
-    errorMap: () => ({ message: 'Invalid grade selected' }),
+    errorMap: () => ({ message: 'Geçersiz sınıf değeri' }),
   }),
   age: z
     .number()
-    .int('Age must be an integer')
-    .min(18, 'You must be at least 18 years old')
-    .max(99, 'Age must be a two-digit number'),
+    .int('Yaşınız tam sayı olmalıdır')
+    .min(18, '18 yaşından küçükler katılamaz')
+    .max(99, 'Geçersiz yaş'),
 });
 
 // Yardımcı Fonksiyon: Telefon Numarasını Formatlama
@@ -35,7 +35,7 @@ const formatPhoneNumber = (value) => {
     return phoneNumber.slice(0, 11);
   }
 
-  // Telefon numarasını formatlama: 0(XXX)-XX-XX
+  // Telefon numarasını formatlama: 0(XXX)-XXX-XX-XX
   let formattedNumber = '';
 
   if (phoneNumber.length > 0) {
@@ -48,10 +48,13 @@ const formatPhoneNumber = (value) => {
     formattedNumber += ')';
   }
   if (phoneNumber.length > 4) {
-    formattedNumber += '-' + phoneNumber.slice(4, 6);
+    formattedNumber += '-' + phoneNumber.slice(4, 7);
   }
-  if (phoneNumber.length > 6) {
-    formattedNumber += '-' + phoneNumber.slice(6, 8);
+  if (phoneNumber.length > 7) {
+    formattedNumber += '-' + phoneNumber.slice(7, 9);
+  }
+  if (phoneNumber.length > 9) {
+    formattedNumber += '-' + phoneNumber.slice(9, 11);
   }
 
   return formattedNumber;
@@ -70,6 +73,7 @@ export default function SubmitForm() {
     age: '',
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false); // Loading durumu ekleyelim
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -95,20 +99,26 @@ export default function SubmitForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
 
     try {
       // Validate form data
       formSchema.parse(formData);
 
+      // Normalize phone number (digits only) for duplication check
+      const normalizedPhone = formData.phone.replace(/\D/g, '');
+
       // Check if phone already exists
       const { data: existingData, error: phoneError } = await supabase
         .from('submissions')
         .select('id')
-        .eq('phone', formData.phone)
+        .eq('phone', normalizedPhone)
         .single();
 
       if (existingData) {
         setError('Bu telefon numarası zaten kayıt edilmiş.');
+        setLoading(false);
         return;
       }
 
@@ -116,7 +126,7 @@ export default function SubmitForm() {
       const { error: insertError } = await supabase.from('submissions').insert({
         name: formData.name,
         email: formData.email,
-        phone: formData.phone,
+        phone: normalizedPhone, // Normalize phone before storing
         department: formData.department,
         grade: formData.grade,
         age: formData.age,
@@ -138,9 +148,13 @@ export default function SubmitForm() {
     } catch (err) {
       if (err instanceof z.ZodError) {
         setError(err.errors[0].message);
+      } else if (err.code === '23505') { // Unique violation error code in PostgreSQL
+        setError('Bu telefon numarası zaten kayıt edilmiş.');
       } else {
         setError(err.message);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -151,7 +165,7 @@ export default function SubmitForm() {
         <input
           type="text"
           name="name"
-          placeholder="Name"
+          placeholder="İsim Soyisim"
           value={formData.name}
           onChange={handleChange}
           required
@@ -161,7 +175,7 @@ export default function SubmitForm() {
         <input
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder="E-mail"
           value={formData.email}
           onChange={handleChange}
           required
@@ -171,7 +185,7 @@ export default function SubmitForm() {
         <input
           type="text"
           name="phone"
-          placeholder="0(5XX)-XX-XX"
+          placeholder="0(XXX)-XXX-XX-XX"
           value={formData.phone}
           onChange={handleChange}
           required
@@ -181,7 +195,7 @@ export default function SubmitForm() {
         <input
           type="text"
           name="department"
-          placeholder="Department"
+          placeholder="Okuduğunuz bölümün"
           value={formData.department}
           onChange={handleChange}
           required
@@ -207,7 +221,7 @@ export default function SubmitForm() {
         <input
           type="number"
           name="age"
-          placeholder="Age"
+          placeholder="Yaşınız"
           value={formData.age}
           onChange={handleChange}
           required
@@ -215,7 +229,9 @@ export default function SubmitForm() {
           max="99"
         />
 
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Gönderiliyor...' : 'Gönder'}
+        </button>
       </form>
       {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
