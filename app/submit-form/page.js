@@ -159,8 +159,8 @@ export default function SubmitForm() {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
+    <div className="form-container">
+      <form onSubmit={handleSubmit} className="info-form">
         {/* Name Field */}
         <input
           type="text"
@@ -169,8 +169,9 @@ export default function SubmitForm() {
           value={formData.name}
           onChange={handleChange}
           required
+          className="form-input"
         />
-
+  
         {/* Email Field */}
         <input
           type="email"
@@ -179,8 +180,9 @@ export default function SubmitForm() {
           value={formData.email}
           onChange={handleChange}
           required
+          className="form-input"
         />
-
+  
         {/* Phone Field */}
         <input
           type="text"
@@ -189,26 +191,31 @@ export default function SubmitForm() {
           value={formData.phone}
           onChange={handleChange}
           required
+          className="form-input"
         />
-
+  
         {/* Department Field */}
         <input
           type="text"
           name="department"
-          placeholder="Okuduğunuz bölümün"
+          placeholder="Okuduğunuz bölüm"
           value={formData.department}
           onChange={handleChange}
           required
+          className="form-input"
         />
-
+  
         {/* Grade Field */}
         <select
           name="grade"
           value={formData.grade}
           onChange={handleChange}
           required
+          className="form-select"
         >
+        
           <option disabled value="Sınıf Seçiniz">Sınıf Seçiniz</option>
+
           <option value="Hazırlık Sınıfı">Hazırlık Sınıfı</option>
           <option value="1. Sınıf">1. Sınıf</option>
           <option value="2. Sınıf">2. Sınıf</option>
@@ -216,7 +223,7 @@ export default function SubmitForm() {
           <option value="4. Sınıf">4. Sınıf</option>
           <option value="Diğer">Diğer</option>
         </select>
-
+  
         {/* Age Field */}
         <input
           type="number"
@@ -227,13 +234,15 @@ export default function SubmitForm() {
           required
           min="18"
           max="99"
+          className="form-input"
         />
-
-        <button type="submit" disabled={loading}>
+  
+        <button type="submit" disabled={loading} className="submit-button">
           {loading ? 'Gönderiliyor...' : 'Gönder'}
         </button>
       </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="error-message">{error}</p>}
     </div>
   );
+  
 }

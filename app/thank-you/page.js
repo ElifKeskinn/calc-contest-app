@@ -28,11 +28,14 @@ export default function ThankYou() {
   }, [countdown, router]);
 
   return (
-    <div>
-      <h1>Bilgilerinizi gönderdiğiniz için teşekkür ederiz!</h1>
-      <p>
+    <div className="thank-you-container">
+      <h1 className="thank-you-heading">
+        Bilgilerinizi gönderdiğiniz için teşekkür ederiz!
+      </h1>
+      <p className="redirect-message">
         Ana sayfaya {countdown} saniye içinde yönlendiriliyorsunuz.
       </p>
     </div>
   );
+
 }

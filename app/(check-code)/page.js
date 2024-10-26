@@ -3,17 +3,19 @@ import { supabase } from '../../lib/client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+
 export default function CheckCode() {
   const router = useRouter();
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
 
   const handleCodeCheck = async (e) => {
+    const lowerCaseCode = code.toLowerCase();
     e.preventDefault();
     const { data, error } = await supabase
       .from('codes')
       .select('*')
-      .eq('code', code)
+      .eq('code', lowerCaseCode)
       .eq('is_used', false)
       .single();
 
@@ -25,17 +27,19 @@ export default function CheckCode() {
   };
 
   return (
-    <div>
-      <form onSubmit={handleCodeCheck}>
+    <div className="code-check-container">
+      <form onSubmit={handleCodeCheck} className="code-check-form">
         <input
           type="text"
           value={code}
           onChange={(e) => setCode(e.target.value)}
           placeholder="Kodunuzu giriniz"
+          className="code-input"
         />
-        <button type="submit">Gönder</button>
+        <button type="submit" className="submit-button">Gönder</button>
       </form>
-      {error && <p>{error}</p>}
+      {error && <p className="error-message">{error}</p>}
     </div>
   );
+  
 }

@@ -1,32 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
+
+/* Base Styles */
 body {
-  font-family: Arial, sans-serif;
-  padding: 20px;
+  margin: 0;
+  font-family: 'Source Code Pro', monospace;
+  background-color: #1e1e1e;
+  color: #d4d4d4;
 }
 
-form {
+input, select, button {
+  font-family: inherit;
+}
+
+a {
+  color: #569cd6;
+  text-decoration: none;
+}
+
+/* Container Styles */
+.code-check-container,
+.form-container,
+.thank-you-container {
   display: flex;
   flex-direction: column;
-  width: 300px;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 0 20px;
 }
 
-input {
-  margin-bottom: 10px;
-  padding: 10px;
-  font-size: 16px;
+.code-check-form,
+.info-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 400px;
 }
 
-button {
-  padding: 10px;
-  background-color: blue;
-  color: white;
+/* Input Styles */
+.code-input,
+.form-input,
+.form-select {
+  background-color: #252526;
+  border: 1px solid #3c3c3c;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  color: #d4d4d4;
+}
+
+.code-input::placeholder,
+.form-input::placeholder {
+  color: #808080;
+}
+
+.form-select {
+  appearance: none;
+}
+
+/* Button Styles */
+.submit-button {
+  background-color: #0b4e7b;
+  color: #ffffff;
   border: none;
+  padding: 14px;
+  border-radius: 4px;
   cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
 }
 
-button:hover {
-  background-color: darkblue;
+.submit-button:disabled {
+  background-color: #3a3d41;
+  cursor: not-allowed;
 }
 
-p {
-  color: red;
+.submit-button:hover:not(:disabled) {
+  background-color: #106aa6;
+}
+
+/* Error Message */
+.error-message {
+  color: #f48771;
+  margin-top: 10px;
+}
+
+/* Thank You Styles */
+.thank-you-heading {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.redirect-message {
+  font-size: 18px;
+  text-align: center;
+}
+
+/* Responsive Styles */
+@media (max-width: 480px) {
+  .code-input,
+  .form-input,
+  .form-select,
+  .submit-button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .thank-you-heading {
+    font-size: 20px;
+  }
+
+  .redirect-message {
+    font-size: 16px;
+  }
 }
